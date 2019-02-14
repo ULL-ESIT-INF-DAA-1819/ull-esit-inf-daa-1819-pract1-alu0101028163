@@ -37,9 +37,9 @@ Consta de un número infinito de registros y un número infinito de instruccione
 
 La clase ReadingHead se encarga de leer los datos de la **cinta de entrada** a partir de un fichero que se pasa por parámetro, por medio de un objeto de la clase **BufferedReader**.
 
-#### WrittingHead
+#### WritingHead
 
-La clase WrittingHead se encarga de escribir los datos resultantes de la ejecución del programa en un **fichero de salida** que representa la **cinta de salida** por medio de un objeto de la clase **BufferedWriter**.
+La clase WritingHead se encarga de escribir los datos resultantes de la ejecución del programa en un **fichero de salida** que representa la **cinta de salida** por medio de un objeto de la clase **BufferedWriter**.
 
 #### DataMemory
 
@@ -67,6 +67,6 @@ La clase Alcu representa la Unidad Aritmética, Lógica y de control. En esta es
 +   Leer y procesar las instrucciones de la memoria de programa.
 +   Leer / escribir en la memoria de datos.
 +   Leer de la cinta de entrada por medio de la ReadingHead.
-+   Escribir en la cinta de salida a través de la WrittingHead.
++   Escribir en la cinta de salida a través de la WritingHead.
 
 Además contiene un **entero** que realiza la función del **registro ip** almacenando el índice donde está almacenada en el ArrayList la instrucción a ejecutar.

@@ -3,13 +3,15 @@ import java.util.*;
 
 public class ReflectionTest{
 
-    public void metodoPrueba(String symb, Integer in){
+    public void metodoPrueba(String symb, ArrayList<Integer> in){
             System.out.println(symb);
-            System.out.println(in.toString());
+            for (int i = 0; i < in.size(); i++){
+                System.out.println(in.get(i).toString());
+            }
     }
 
 
-    public void llamarFuncion(String nombreFuncion, String symb, Integer in) throws Exception{
+    public void llamarFuncion(String nombreFuncion, String symb, ArrayList<Integer> in) throws Exception{
         ReflectionTest arr = new ReflectionTest();
         java.lang.reflect.Method method = null;
         try{
@@ -31,7 +33,9 @@ public class ReflectionTest{
 
     public static void main(String args[]) throws Exception{
         ReflectionTest arr = new ReflectionTest();
-        Integer num_ = new Integer(20);
+        ArrayList<Integer> num_ = new ArrayList<Integer>();
+        num_.add(new Integer(20));
+        num_.add(new Integer(30));
         arr.llamarFuncion("metodoPrueba", "*", num_);
     }
 
