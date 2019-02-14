@@ -37,6 +37,36 @@ Consta de un número infinito de registros y un número infinito de instruccione
 
 La clase ReadingHead se encarga de leer los datos de la **cinta de entrada** a partir de un fichero que se pasa por parámetro, por medio de un objeto de la clase **BufferedReader**.
 
-#### WritingHead
+#### WrittingHead
 
-La clase WritingHead se encarga de escribr los datos resultantes de la ejecución del programa en un **fichero de salida** que representa la **cinta de salida** por medio de un objeto de la clase **FileOutputStream**.
+La clase WrittingHead se encarga de escribir los datos resultantes de la ejecución del programa en un **fichero de salida** que representa la **cinta de salida** por medio de un objeto de la clase **BufferedWriter**.
+
+#### DataMemory
+
+La clase DataMemory alberga los registros de la máquina como un **ArrayList de enteros**. A priori no podemos saber cuántos registros se van a necesitar, así que tenemos dos opciones:
+
+1. Hacerle una pasada completa al programa para contar el número de registros diferentes que se requieren e inicializar posteriormente el ArrayList.
+    + _Puntos a favor_ : Las inserciones son más eficientes porque sabemos el espacio de antemano y no tenemos que hacer un resize al vector cada vez que nos quedamos sin tamaño.
+    + _Puntos en contra_ :  La complejidad intrínseca de tener que analizar las instrucciones una por una para saber qué tipo de operando se está tratando.  
+
+2. Añadir registros a medida que se leen de la memoria de instrucciones.
+    + _Puntos a favor_ : Es más sencillo de implementar que el método anterior y además en caso de que el programa fallase nos ahorraríamos tiempo.
+
+En nuestro caso implementamos la segunda opción.
+
+
+#### ProgramMemory
+
+La clase ProgramMemory alberga los programas de la máquina como un **ArrayList de Strings**, la etiqueta de cada instrucción es representada como un indice.
+
+
+#### Alcu
+
+La clase Alcu representa la Unidad Aritmética, Lógica y de control. En esta están contenidas instancias de todas las clases anteriores y es la que se encarga de:
+
++   Leer y procesar las instrucciones de la memoria de programa.
++   Leer / escribir en la memoria de datos.
++   Leer de la cinta de entrada por medio de la ReadingHead.
++   Escribir en la cinta de salida a través de la WrittingHead.
+
+Además contiene un **entero** que realiza la función del **registro ip** almacenando el índice donde está almacenada en el ArrayList la instrucción a ejecutar.
