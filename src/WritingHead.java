@@ -22,7 +22,7 @@ public class WritingHead{
     }
 
     /**
-    *   It creates a buffer stream for writing into the output file.
+    *   It creates a stream buffer for writing into the output file.
     *   @param  outputTape   path of the output file where we're
     *                       going to write the data.
     *   @throws IllegalArgumentException - If sz is <= 0

@@ -14,7 +14,6 @@ class ReadingHead{
         *   This is the constructor of the class.
         *   @param inputTape    the name of the file that contains the
         *                       input tape data.
-        *   @return             it returns an instance of the class.
         *   @see                loadTape
         */
         public ReadingHead(String inputTape) throws Exception{
@@ -22,7 +21,7 @@ class ReadingHead{
         }
 
         /**
-        *   It created a buffer that contains the data from the
+        *   It created a stream buffer that contains the data from the
         *   input tape (which is a file) and allows us to read it.
         *   @param  inputTape   the name of the file that contains the
         *                       input tape data.
