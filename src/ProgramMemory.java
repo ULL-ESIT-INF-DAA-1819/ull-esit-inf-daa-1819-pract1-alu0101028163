@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.*;
+import  javafx.util.*;
 
 /**
 *   This class represents the Program Memory for the RAM.
@@ -36,18 +37,25 @@ class ProgramMemory{
       return false;
     }
 
+    /**
+    *   It parses the input program into tokens and store them
+    *   as instructions in memory.
+    *   @param instruction  string containing one instruction
+    *   @return             an Instruction instance.
+    */
+
     public Instruction parseInstruction(String instruction){
       boolean isJump = false;
       String label = null;
       String body = null;
       String operand = null;
-      Integer value = null;
 
-      String[] parsedInstr = instruction.split(":");
+      String[] parsedInstr = instruction.split("\\:");
 
       int index = 0;
 
       if (parsedInstr.length == 2){ // Posee una etiqueta.
+        System.out.println("POOSE ETIQUETA");
         label = parsedInstr[0];
         index++;
       }
@@ -56,12 +64,12 @@ class ProgramMemory{
       if (parsedInstr[index].split(" ").length == 2){
         parsedOperand = parsedInstr[index].split("\\s+");
         operand = " ";
-      }else if (parsedInstr[index].split("*").length == 2){
+      }else if (parsedInstr[index].split("\\*").length == 2){
         operand = "*";
-        parsedOperand = parsedInstr[index].split("*");
-      }else if (parsedInstr[index].split("=").length == 2){
+        parsedOperand = parsedInstr[index].split("\\*");
+      }else if (parsedInstr[index].split("\\=").length == 2){
         operand = "=";
-        parsedOperand = parsedInstr[index].split("=");
+        parsedOperand = parsedInstr[index].split("\\=");
       }else{
         throw new AssertionError("No symbol or space between instruction and operand");
       }
@@ -72,19 +80,49 @@ class ProgramMemory{
         throw new AssertionError("No instruction");
       }
 
-      if (isInstruction(parsedOperand[1])){
-        value = Integer.parseInt(parsedOperand[1]);
+
+      if (body.equals("JZERO") || body.equals("JUMP")){
+                isJump = true;
+      }
+
+
+      if ((parsedOperand[1] != null)&&(!isJump)){
+          Integer value = Integer.parseInt(parsedOperand[1]);
+          return new Instruction<Integer>(isJump, label, body, operand, value);
+      }else if ((parsedOperand[1] != null)&&(isJump)){
+          String value = parsedOperand[1];
+          return new Instruction<String>(isJump, label, body, operand, value);
       }else{
         throw new AssertionError("No operand");
       }
 
-      if (body.equals("JZERO") || body.equals("JUMP")){
-          isJump = true;
+    }
+
+
+    /**
+    *   This function replaces the Labels strings in the jump
+    *   instructions with numbers.
+    */
+
+    public void insertLabels(){
+      ArrayList< Pair<Integer,String> > myLabels = new ArrayList< Pair<Integer,String> >();
+
+      for (int i = 0; i < prMemory.size(); i++){
+        if (prMemory.get(i).getLabel() != null){
+          Pair<Integer,String> pair = new Pair<Integer,String>(i, prMemory.get(i).getLabel());
+          myLabels.add(pair);
+        }
       }
 
-      return new Instruction(isJump, label, body, operand, value);
-
-
+      for (int i = 0; i < prMemory.size(); i++){
+        if (prMemory.get(i).isJumpInstruction()){
+          for (int j = 0; j < myLabels.size(); j++){
+            if (prMemory.get(i).getValue().equals(myLabels.get(j).getValue())){
+                prMemory.get(i).setValue(Integer.toString(myLabels.get(j).getKey()));
+            }
+          }
+        }
+      }
 
     }
 
@@ -134,6 +172,8 @@ class ProgramMemory{
 
     public static void main(String args[]) throws Exception{
         ProgramMemory pm = new ProgramMemory("myProgram.out");
+        pm.showProgram();
+        pm.insertLabels();
         pm.showProgram();
         //System.out.println(pm.readInstruction(0));
     }
