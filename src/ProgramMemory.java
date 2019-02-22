@@ -55,7 +55,6 @@ class ProgramMemory{
       int index = 0;
 
       if (parsedInstr.length == 2){ // Posee una etiqueta.
-        System.out.println("POOSE ETIQUETA");
         label = parsedInstr[0];
         index++;
       }
@@ -86,12 +85,19 @@ class ProgramMemory{
       }
 
 
-      if ((parsedOperand[1] != null)&&(!isJump)){
+      /*if ((parsedOperand[1] != null)&&(!isJump)){
           Integer value = Integer.parseInt(parsedOperand[1]);
           return new Instruction<Integer>(isJump, label, body, operand, value);
       }else if ((parsedOperand[1] != null)&&(isJump)){
           String value = parsedOperand[1];
           return new Instruction<String>(isJump, label, body, operand, value);
+      }else{
+        throw new AssertionError("No operand");
+      }*/
+
+      if (parsedOperand[1] != null){
+          String value = parsedOperand[1];
+          return new Instruction(isJump, label, body, operand, value);
       }else{
         throw new AssertionError("No operand");
       }
@@ -158,6 +164,10 @@ class ProgramMemory{
         }
     }
 
+    public Instruction getInstruction(int instrPointer){
+      return prMemory.get(instrPointer);
+    }
+
     /**
     *   It returns an instruction accesing to it by its index
     *   in the ArrayList.
@@ -171,10 +181,15 @@ class ProgramMemory{
     }
 
     public static void main(String args[]) throws Exception{
-        ProgramMemory pm = new ProgramMemory("myProgram.out");
+         ProgramMemory pm = new ProgramMemory("myProgram.out");
         pm.showProgram();
         pm.insertLabels();
+        System.out.println("---------------------------");
+        System.out.println("AFTER PARSING THE INSTRUCTIONS");
+        System.out.println("---------------------------");
         pm.showProgram();
+        //Instruction instr = pm.getInstruction(0);
+        //System.out.println(instr);
         //System.out.println(pm.readInstruction(0));
     }
 
