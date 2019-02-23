@@ -29,7 +29,11 @@ public class DataMemory{
           dtMemory.add(i,0);
         }
       }
-      dtMemory.add(register,data);
+      if(dtMemory.size() > register){
+        dtMemory.set(register,data);
+      }else{
+        dtMemory.add(register,data);
+      }
     }
 
     /**
@@ -63,6 +67,10 @@ public class DataMemory{
 
     public static void main(String args[]){
       DataMemory dt = new DataMemory();
+      dt.setData(0,1);
+      dt.setData(1,2);
+      dt.setData(2,3);
+      System.out.println(dt.toString());
       dt.setData(0,1);
       dt.setData(1,2);
       dt.setData(2,3);

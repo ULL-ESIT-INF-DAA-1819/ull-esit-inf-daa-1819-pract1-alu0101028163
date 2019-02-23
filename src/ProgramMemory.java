@@ -1,6 +1,7 @@
 import java.util.*;
 import java.io.*;
 import  javafx.util.*;
+import java.util.regex.*;
 
 /**
 *   This class represents the Program Memory for the RAM.
@@ -31,7 +32,7 @@ class ProgramMemory{
 
     public boolean isInstruction(String instr){
       for (String str : INSTRUCTION_VALUES){
-        if (str.equals(instr))
+        if (str.equals(instr.toUpperCase()))
            return true;
       }
       return false;
@@ -49,6 +50,79 @@ class ProgramMemory{
       String label = null;
       String body = null;
       String operand = null;
+      String value = null;
+
+      String regex1 = "^([a-zA-Z]{1,}:)\\s{0,}([a-zA-Z]{1,})(\\*|\\s|=)([0-9]+)"; // Con etiqueta
+      String regex2 = "^(([a-zA-Z]{1,})(\\*|\\s|=)([0-9]+))"; // Sin etiqueta
+      String regex3 = "^(([a-zA-Z]{1,})\\s([a-zA-Z]{1,}))"; // Con salto
+      String regex4 = "^HALT$|^halt$"; // HALT
+
+      /**
+       * This would parse a non-jump insruction with a label.
+       */
+      Pattern pattern = Pattern.compile(regex1);
+      Matcher matcher = pattern.matcher(instruction);
+
+      if (matcher.find()){
+        label = matcher.group(1);
+        label = label.substring(0, label.length() - 1);
+        body = matcher.group(2);
+        operand = matcher.group(3);
+        value = matcher.group(4);
+        return new Instruction(isJump, label, body, operand, value);
+      }
+
+      /**
+       * This would parse a non-jump instruction without a label.
+       */
+      pattern = Pattern.compile(regex2);
+      matcher = pattern.matcher(instruction);
+
+      if (matcher.find()){
+        body = matcher.group(2);
+        operand = matcher.group(3);
+        value = matcher.group(4);
+        return new Instruction(isJump, label, body, operand, value);
+      }
+
+      /**
+       * This would parse a jump instruction.
+       */
+
+
+      pattern = Pattern.compile(regex3);
+      matcher = pattern.matcher(instruction);
+
+      if (matcher.find()){
+        body = matcher.group(2);
+        operand = " ";
+        isJump = true;
+        value = matcher.group(3);
+        return new Instruction(isJump, label, body, operand, value);
+      }
+
+      /**
+       * This would parse a HALT instruction.
+       */
+
+
+      pattern = Pattern.compile(regex4);
+      matcher = pattern.matcher(instruction);
+
+      if (matcher.find()){
+        body = matcher.group(0);
+        operand = " ";
+        isJump = true;
+        value = "-1";
+        return new Instruction(isJump, label, body, operand, value);
+      }
+
+      return null;
+
+      /*String[] parsedComment = instruction.split("");
+      if(parsedComment[0].equals("#")){
+        return null;
+      }
 
       String[] parsedInstr = instruction.split("\\:");
 
@@ -57,6 +131,10 @@ class ProgramMemory{
       if (parsedInstr.length == 2){ // Posee una etiqueta.
         label = parsedInstr[0];
         index++;
+      }
+
+      if(parsedInstr[0].equals("HALT")){
+        return new Instruction(isJump, label, "HALT", " ", "-1");
       }
 
       String[] parsedOperand;
@@ -75,32 +153,25 @@ class ProgramMemory{
 
       if (isInstruction(parsedOperand[0])){
         body = parsedOperand[0];
+        System.out.println(parsedOperand[0]);
       }else{
         throw new AssertionError("No instruction");
       }
 
 
-      if (body.equals("JZERO") || body.equals("JUMP")){
+      if (body.equals("JZERO") || body.equals("JUMP") || body.equals("JGTZ")){
                 isJump = true;
       }
 
 
-      /*if ((parsedOperand[1] != null)&&(!isJump)){
-          Integer value = Integer.parseInt(parsedOperand[1]);
-          return new Instruction<Integer>(isJump, label, body, operand, value);
-      }else if ((parsedOperand[1] != null)&&(isJump)){
-          String value = parsedOperand[1];
-          return new Instruction<String>(isJump, label, body, operand, value);
+      if (parsedOperand[1] != null){ // Hay operando
+          System.out.println(parsedOperand[1]);
+          String[] value = parsedOperand[1].split("\\#"); // Removes possible comments
+          System.out.println(value[0]);
+          return new Instruction(isJump, label, body, operand, value[0]);
       }else{
         throw new AssertionError("No operand");
       }*/
-
-      if (parsedOperand[1] != null){
-          String value = parsedOperand[1];
-          return new Instruction(isJump, label, body, operand, value);
-      }else{
-        throw new AssertionError("No operand");
-      }
 
     }
 
@@ -115,7 +186,7 @@ class ProgramMemory{
 
       for (int i = 0; i < prMemory.size(); i++){
         if (prMemory.get(i).getLabel() != null){
-          Pair<Integer,String> pair = new Pair<Integer,String>(i, prMemory.get(i).getLabel());
+          Pair<Integer,String> pair = new Pair<Integer,String>(new Integer(i), prMemory.get(i).getLabel());
           myLabels.add(pair);
         }
       }
@@ -147,9 +218,16 @@ class ProgramMemory{
         String programLine = " ";
         /* While we don't reach the EOF,
            we store the data from the file into the ArrayList*/
+        Integer line = new Integer(0);
         while ((programLine = reader.readLine()) != null){
-            prMemory.add(parseInstruction(programLine));
+            Instruction instr = parseInstruction(programLine);
+            if (instr != null){
+              instr.setLine(line);
+              prMemory.add(instr);
+            }
+            line++;
         }
+        insertLabels();
         /* We close the stream buffer*/
         reader.close();
     }
@@ -180,14 +258,23 @@ class ProgramMemory{
         return prMemory.get(label);
     }
 
+    public String toString(){
+      String str = "\n PROGRAM MEMORY\n";
+      for (int i = 0; i < prMemory.size(); i++){
+          str += "  " + prMemory.get(i).toString() + "\n";
+      }
+      return str;
+    }
+
+
+    public int getSize(){
+      return prMemory.size();
+    }
+
     public static void main(String args[]) throws Exception{
-         ProgramMemory pm = new ProgramMemory("myProgram.out");
-        pm.showProgram();
+        ProgramMemory pm = new ProgramMemory("myProgram.out");
         pm.insertLabels();
-        System.out.println("---------------------------");
-        System.out.println("AFTER PARSING THE INSTRUCTIONS");
-        System.out.println("---------------------------");
-        pm.showProgram();
+        System.out.println(pm);
         //Instruction instr = pm.getInstruction(0);
         //System.out.println(instr);
         //System.out.println(pm.readInstruction(0));

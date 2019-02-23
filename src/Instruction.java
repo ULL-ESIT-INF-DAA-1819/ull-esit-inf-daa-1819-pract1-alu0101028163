@@ -8,6 +8,7 @@ public class Instruction{
   private String body;
   private String operand;
   private String value;
+  private Integer line;
 
   /**
    * Constructor of the class
@@ -70,6 +71,10 @@ public class Instruction{
     return value;
   }
 
+  public Integer getLine(){
+    return line;
+  }
+
   /**
    * Sets the jumpInstruction attribute value
    * @param jumpInstruction
@@ -120,6 +125,10 @@ public class Instruction{
     this.value = value;
   }
 
+  public void setLine(Integer line){
+    this.line = line;
+  }
+
 
   /**
    * toString method for printing the Instruction
@@ -127,6 +136,7 @@ public class Instruction{
    */
   public String toString(){
     String str = "";
+    str += Integer.toString(line) + " ";
     if (label != null){
       str += label + " ";
     }
