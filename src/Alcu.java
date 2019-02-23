@@ -13,7 +13,18 @@ public class Alcu{
     private int         instrPointer;
     private int         debugMode;
 
-
+    /**
+     * Constructor of the Arithmetic Logic and Control Unit.
+     * @param  programPath  the path of the file that contains the
+     *                      program instructions
+     * @param  inputTape    the path of the file that contains the
+     *                      input-tape's content
+     * @param  outputTape   the path of the file that contains the
+     *                      output-tape's content
+     * @param  debugMode    activated in case is 1. Prints the machine
+     *                      content during each instruction execution.
+     * @throws Exception
+     */
     public Alcu(String programPath, String inputTape, String outputTape, int debugMode) throws Exception{
         programMemory = new ProgramMemory(programPath);
         dataMemory = new DataMemory();
@@ -25,16 +36,39 @@ public class Alcu{
         instrPointer = 0;
     }
 
+    /**
+     * Reads the next symbol from the input tape.
+     * @return the actual integer to be readed.
+     * @throws Exception
+     */
     public Integer readHead() throws Exception{
       String inputSymbol = readingHead.readSymbol();
       return Integer.parseInt(inputSymbol);
     }
 
+    /**
+     * Writes a symbol into the output tape.
+     * @param  symbol    to be written into the output tape
+     * @throws Exception
+     */
     public void writeHead(Integer symbol) throws Exception{
       writingHead.writeSymbol(symbol);
     }
 
-    public void load(String operand, Integer value){
+    /**
+     * It loads a value into the machine's accumulator.
+     * @param  operand   it specifies the type of addressing.
+     *                  "=" loads the value directly into the acc.
+     *                  " " loads the value contained in the
+     *                  register with the number specified by the
+     *                  following parameter.
+     *                  "*" loads the value contained in the register
+     *                  that's contained in the register specified
+     *                  by the following parameter.
+     * @param  value     integer to hold by the accumulator
+     * @throws IllegalArgumentException   if the operand doesn't exist.
+     */
+    public void load(String operand, Integer value) throws Exception{
         if (operand.equals("=")){
           dataMemory.setData(0, value);
         }else if (operand.equals(" ")){
@@ -49,7 +83,17 @@ public class Alcu{
         }
     }
 
-    public void store(String operand, Integer direction){
+    /**
+     * Stores the content of the accumulator inside another register.
+     * @param  operand   it specifies the type of addressing.
+     *                   " " stores the value directly into the
+     *                   register specified by the following parameter.
+     *                   "*" same as above but with indirect adressing.
+     * @param  direction of the register where the value will be placed
+     *                   or is contained the register to hold the value.
+     * @throws IllegalArgumentException   if the operand doesn't exist.
+     */
+    public void store(String operand, Integer direction) throws Exception {
       if (operand.equals(" ")){
         Integer value = dataMemory.getData(0);
         dataMemory.setData(direction, value);
@@ -62,7 +106,62 @@ public class Alcu{
       }
     }
 
-    public void mul(String operand, Integer value){
+    /**
+     * Adds the content of the accumulator with another value
+     * that can be directly passed as argument or allocated in
+     * another register and stores the result in the accumulator.
+     * @param  operand   for addressing.
+     * @param  value     to be added or register.
+     * @throws Exception IllegalArgumentException
+     */
+    public void add(String operand, Integer value) throws Exception {
+      if (operand.equals("=")){
+        Integer accVal = dataMemory.getData(0);
+        dataMemory.setData(0, accVal + value);
+      }else if (operand.equals(" ")){
+        Integer regVal = dataMemory.getData(value);
+        Integer accVal = dataMemory.getData(0);
+        dataMemory.setData(0, accVal + regVal);
+      }else if (operand.equals("*")){
+        Integer newDirection = dataMemory.getData(value);
+        Integer regVal = dataMemory.getData(newDirection);
+        Integer accVal = dataMemory.getData(0);
+        dataMemory.setData(0, accVal + regVal);
+      }else{
+        throw new IllegalArgumentException("No valid operand");
+      }
+    }
+
+    /**
+     * Analogous to the add method but substracting.
+     * @see add
+     */
+    public void sub(String operand, Integer value) throws Exception{
+      if (operand.equals("=")){
+        Integer accVal = dataMemory.getData(0);
+        dataMemory.setData(0, accVal - value);
+      }else if (operand.equals(" ")){
+        Integer regVal = dataMemory.getData(value);
+        Integer accVal = dataMemory.getData(0);
+        dataMemory.setData(0, accVal - regVal);
+      }else if (operand.equals("*")){
+        Integer newDirection = dataMemory.getData(value);
+        Integer regVal = dataMemory.getData(newDirection);
+        Integer accVal = dataMemory.getData(0);
+        dataMemory.setData(0, accVal - regVal);
+      }else{
+        throw new IllegalArgumentException("No valid operand");
+      }
+    }
+
+    /**
+     * Multiplies a value with the value stored in the Accumulator
+     * and saves the result back into the accumulator.
+     * @param  operand   for addressing.
+     * @param  value     to make the product with or register.
+     * @throws IllegalArgumentException
+     */
+    public void mul(String operand, Integer value) throws Exception{
       Integer nTimes = null;
       if (operand.equals("=")){
         nTimes = value - 1;
@@ -79,9 +178,17 @@ public class Alcu{
       for (int i = 0; i < nTimes; i++){
         add("=", initialValue);
       }
+
     }
 
-    public void div(String operand, Integer value){
+    /**
+     * Divides a value with the value stored in the Accumulator
+     * and saves the result back into the accumulator.
+     * @param  operand   for addressing.
+     * @param  value     to make the division with or register.
+     * @throws IllegalArgumentException
+     */
+    public void div(String operand, Integer value) throws Exception{
       Integer divisor = null;
       if (operand.equals("=")){
         divisor = value;
@@ -109,42 +216,15 @@ public class Alcu{
         dataMemory.setData(0, quotient);
     }
 
-    public void add(String operand, Integer value){
-      if (operand.equals("=")){
-        Integer accVal = dataMemory.getData(0);
-        dataMemory.setData(0, accVal + value);
-      }else if (operand.equals(" ")){
-        Integer regVal = dataMemory.getData(value);
-        Integer accVal = dataMemory.getData(0);
-        dataMemory.setData(0, accVal + regVal);
-      }else if (operand.equals("*")){
-        Integer newDirection = dataMemory.getData(value);
-        Integer regVal = dataMemory.getData(newDirection);
-        Integer accVal = dataMemory.getData(0);
-        dataMemory.setData(0, accVal + regVal);
-      }else{
-        throw new IllegalArgumentException("No valid operand");
-      }
-    }
 
-    public void sub(String operand, Integer value){
-      if (operand.equals("=")){
-        Integer accVal = dataMemory.getData(0);
-        dataMemory.setData(0, accVal - value);
-      }else if (operand.equals(" ")){
-        Integer regVal = dataMemory.getData(value);
-        Integer accVal = dataMemory.getData(0);
-        dataMemory.setData(0, accVal - regVal);
-      }else if (operand.equals("*")){
-        Integer newDirection = dataMemory.getData(value);
-        Integer regVal = dataMemory.getData(newDirection);
-        Integer accVal = dataMemory.getData(0);
-        dataMemory.setData(0, accVal - regVal);
-      }else{
-        throw new IllegalArgumentException("No valid operand");
-      }
-    }
-
+    /**
+     * Reads a value from the input tape and stores it straight
+     * into a register. The register cannot be the accumulator.
+     * @param  operand   for addressing.
+     * @param  direction to store the readed value.
+     * @throws IllegalArgumentException in case you use a non valid
+     *                                  argument or the accumulator.
+     */
     public void read(String operand, Integer direction) throws Exception{
 
        if (operand.equals(" ")){
@@ -155,6 +235,9 @@ public class Alcu{
         }
        }else if (operand.equals("*")){
          Integer newDirection = dataMemory.getData(direction);
+         if(newDirection == 0){
+            throw new IllegalArgumentException("Accumulator can't store input tape numbers by read instruction");
+         }
          dataMemory.setData(newDirection, readHead());
        }else{
          throw new IllegalArgumentException("No valid operand");
@@ -162,6 +245,14 @@ public class Alcu{
 
     }
 
+    /**
+     * Reads a value into the output tape straight from a register.
+     * The register cannot be the accumulator.
+     * @param  operand   for addressing.
+     * @param  direction to retrieve the value to be written.
+     * @throws IllegalArgumentException in case you use a non valid
+     *                                  argument or the accumulator.
+     */
     public void write(String operand, Integer value) throws Exception{
       if (operand.equals("=")){
         writeHead(value);
@@ -179,6 +270,13 @@ public class Alcu{
       }
     }
 
+    /**
+     * It jumps into a label, which means it trasfer the program
+     * control flow from one point to the labeled point.
+     * @param operand  must always be a whitespace.
+     * @param value    that represents the position in the array
+     *                 of the program memory where the label is.
+     */
     public void jump(String operand, Integer value){
       if (operand.equals(" ")){
         instrPointer = value;
@@ -187,7 +285,15 @@ public class Alcu{
       }
     }
 
-    public void jzero(String operand, Integer value){
+    /**
+     * It jumps into a label, which means it trasfer the program
+     * control flow from one point to the labeled point when the
+     * accumulator's value is zero.
+     * @param operand  must always be a whitespace.
+     * @param value    that represents the position in the array
+     *                 of the program memory where the label is.
+     */
+    public void jzero(String operand, Integer value) throws Exception {
       if (operand.equals(" ")){
         if(dataMemory.getData(0) == 0){
           instrPointer = value;
@@ -197,7 +303,15 @@ public class Alcu{
       }
     }
 
-    public void jgtz(String operand, Integer value){
+    /**
+     * It jumps into a label, which means it trasfer the program
+     * control flow from one point to the labeled point while the
+     * accumulator's value is greater than zero.
+     * @param operand  must always be a whitespace.
+     * @param value    that represents the position in the array
+     *                 of the program memory where the label is.
+     */
+    public void jgtz(String operand, Integer value) throws Exception {
       if (operand.equals(" ")){
         if(dataMemory.getData(0) > 0){
           instrPointer = value;
@@ -207,11 +321,26 @@ public class Alcu{
       }
     }
 
+    /**
+     * It stops the execution of the program.
+     * @param operand   useless parameter it's automatically set to whitespace
+     *                  during its creation.
+     * @param value     useless parameter it's automatically set to -1
+     *                  during its creation.
+     */
     public void halt(String operand, Integer value){
       instrPointer = -1;
       System.out.println("Exit by Halt instruction\n");
     }
 
+    /**
+     * Contains a loop that executes each program instruction while it doesn't
+     * reach the end of the program memory or encounters a halt instruction.
+     * It also handles exceptions, prints the machine trace if the machine is
+     * in the debug mode and closes the resources safely in sucessful and unsucessful
+     * executions.
+     * @throws Exception from the machineTrace() and stop() methods.
+     */
     public void run() throws Exception{
       boolean running = false;
       while ((instrPointer != -1) && (instrPointer < programMemory.getSize())){
@@ -226,6 +355,12 @@ public class Alcu{
              System.out.println("Error in Instruction: ");
              System.out.println(programMemory.getInstruction(currentInstruction));
              System.out.println(ee);
+          }else if (ee instanceof IndexOutOfBoundsException){
+            System.out.println("Error in Instruction: ");
+            System.out.println(programMemory.getInstruction(currentInstruction));
+            System.out.println(ee);
+          }else{
+            System.out.println(e);
           }
           instrPointer = -1;
          }
@@ -235,6 +370,10 @@ public class Alcu{
       stop();
     }
 
+    /**
+     * Calls the next function to be called.
+     * @throws Exception
+     */
     public void step() throws Exception{
       Instruction currentInstruction = programMemory.getInstruction(instrPointer);
       instrPointer++;
@@ -243,14 +382,31 @@ public class Alcu{
         llamarFuncion(currentInstruction.getBody(), currentInstruction.getOperand(), value);
       }catch(IllegalArgumentException e){
          throw e;
-     }
+      }catch(Exception e){
+         throw e;
+      }
     }
 
+    /**
+     * Free the resources used by the input and output units.
+     * @throws Exception
+     */
     public void stop() throws Exception{
       writingHead.closeTape();
       readingHead.closeTape();
     }
 
+    /**
+     * Calls a function using java reflection in execution time.
+     * @param  nombreFuncion  name of the function to be called.
+     * @param  symb           in this case the operand of the instruction.
+     * @param  in             in this case the value to be passed to the
+     *                        instruction ( a register, a number, a label ...)
+     * @throws SecurityException
+     * @throws NoSuchMethodException if the method doesn't exist
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     */
     public void llamarFuncion(String nombreFuncion, String symb, Integer in) throws Exception{
 
        boolean running = false;
@@ -258,9 +414,9 @@ public class Alcu{
        try{
            method = this.getClass().getMethod(nombreFuncion.toLowerCase(), symb.getClass(), in.getClass());
        }catch(SecurityException e){
-           System.out.println("Excepción de Seguridad");
+           System.out.println("Security exception");
        }catch(NoSuchMethodException e){
-           System.out.println("El método no existe");
+           System.out.println("Method doesn't exists");
        }
 
        try{
@@ -272,6 +428,12 @@ public class Alcu{
        }
    }
 
+   /**
+    * Prints the content of the input and output tapes,
+    * the program and data memory and current instruction being
+    * executed.
+    * @throws Exception 
+    */
    public void machineTrace() throws Exception{
       System.out.println("-------------------------");
       System.out.println(programMemory);
@@ -301,11 +463,13 @@ public class Alcu{
         if (args.length != 4){
             throw new RuntimeException("Wrong number of Arguments introduced");
         }
-        
+
         Alcu alphie = new Alcu(args[0], args[1], args[2], Integer.parseInt(args[3]));
         alphie.run();
+        if(args[3].equals("0")){
+          alphie.machineTrace();
+        }
 
-        alphie.machineTrace();
     }
 
 }

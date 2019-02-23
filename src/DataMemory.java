@@ -24,15 +24,21 @@ public class DataMemory{
      * @param data      to be stored.
      */
     public void setData(int register, Integer data){
+
       if(register > dtMemory.size()){
         for (int i = dtMemory.size(); i <= register; i++){
           dtMemory.add(i,0);
         }
       }
+
       if(dtMemory.size() > register){
         dtMemory.set(register,data);
       }else{
         dtMemory.add(register,data);
+      }
+
+      if(register < 0){
+        throw new IndexOutOfBoundsException("Register " + register + " is negative. No negative registers allowed");
       }
     }
 
@@ -41,11 +47,15 @@ public class DataMemory{
      * @param  register  where the data is stored
      * @return           the data stored.
      */
-    public Integer getData(int register){
-      if (register > dtMemory.size()){
-        throw new IndexOutOfBoundsException("Register " + register + " is empty");
+    public Integer getData(int register) throws Exception{
+
+      if (register >= dtMemory.size()){
+        setData(register,0);
+      }else if(register < 0){
+        throw new IndexOutOfBoundsException("Register " + register + " is negative. No negative registers allowed");
       }
-      return dtMemory.get(register);
+        return dtMemory.get(register);
+
     }
 
     /**
@@ -65,16 +75,17 @@ public class DataMemory{
       return str;
     }
 
-    public static void main(String args[]){
+    public static void main(String args[]) throws Exception{
       DataMemory dt = new DataMemory();
       dt.setData(0,1);
       dt.setData(1,2);
       dt.setData(2,3);
       System.out.println(dt.toString());
-      dt.setData(0,1);
-      dt.setData(1,2);
-      dt.setData(2,3);
+      dt.setData(0,-1);
+      dt.setData(1,-2);
+      dt.setData(2,-3);
       System.out.println(dt.toString());
+      System.out.println(dt.getData(-1));
     }
 
 }

@@ -8,7 +8,7 @@ public class RegexTest{
     String regex1 = "^([a-zA-Z]{1,}:)\\s{0,}([a-zA-Z]{1,})(\\*|\\s|=)([0-9]+)"; // Con etiqueta
     String regex2 = "^(([a-zA-Z]{1,})(\\*|\\s|=)([0-9]+))"; // Sin etiqueta
     String regex3 = "^(([a-zA-Z]{1,})\\s([a-zA-Z]{1,}))"; // Con salto
-    String regex4 = "^HALT$|^halt$";
+    String regex4 = "^[H|h][A|a][L|l][T|t]$";
 
     Pattern pattern = Pattern.compile(regex1);
     Matcher matcher = pattern.matcher(s);
@@ -48,6 +48,10 @@ public class RegexTest{
       System.out.println("HALT");
       System.out.println(matcher.group(0));
     }
+    // Integer n = new Integer(-2);
+    // System.out.println(n);
   }
+
+
 
 }

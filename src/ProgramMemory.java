@@ -30,6 +30,11 @@ class ProgramMemory{
         loadProgram(programPath);
     }
 
+    /**
+     * Checks if an instrucion belongs to the machine's instruction set.
+     * @param  instr string that contains the instruction
+     * @return       true if it belongs, false if it doesn't.
+     */
     public boolean isInstruction(String instr){
       for (String str : INSTRUCTION_VALUES){
         if (str.equals(instr.toUpperCase()))
@@ -45,17 +50,17 @@ class ProgramMemory{
     *   @return             an Instruction instance.
     */
 
-    public Instruction parseInstruction(String instruction){
+    public Instruction parseInstruction(String instruction) throws Exception{
       boolean isJump = false;
       String label = null;
       String body = null;
       String operand = null;
       String value = null;
 
-      String regex1 = "^([a-zA-Z]{1,}:)\\s{0,}([a-zA-Z]{1,})(\\*|\\s|=)([0-9]+)"; // Con etiqueta
-      String regex2 = "^(([a-zA-Z]{1,})(\\*|\\s|=)([0-9]+))"; // Sin etiqueta
+      String regex1 = "^([a-zA-Z]{1,}:)\\s{0,}([a-zA-Z]{1,})(\\*|\\s|=)([+|-]?[0-9]+)"; // Con etiqueta
+      String regex2 = "^(([a-zA-Z]{1,})(\\*|\\s|=)([+|-]?[0-9]+))"; // Sin etiqueta
       String regex3 = "^(([a-zA-Z]{1,})\\s([a-zA-Z]{1,}))"; // Con salto
-      String regex4 = "^HALT$|^halt$"; // HALT
+      String regex4 = "^[H|h][A|a][L|l][T|t]$"; // HALT
 
       /**
        * This would parse a non-jump insruction with a label.
@@ -66,7 +71,7 @@ class ProgramMemory{
       if (matcher.find()){
         label = matcher.group(1);
         label = label.substring(0, label.length() - 1);
-        body = matcher.group(2);
+        body = matcher.group(2).toUpperCase();
         operand = matcher.group(3);
         value = matcher.group(4);
         return new Instruction(isJump, label, body, operand, value);
@@ -79,10 +84,14 @@ class ProgramMemory{
       matcher = pattern.matcher(instruction);
 
       if (matcher.find()){
-        body = matcher.group(2);
+        body = matcher.group(2).toUpperCase();
         operand = matcher.group(3);
         value = matcher.group(4);
-        return new Instruction(isJump, label, body, operand, value);
+        if(isInstruction(body)){
+          return new Instruction(isJump, label, body, operand, value);
+        }else{
+          throw new AssertionError("Invalid Instruction: " + instruction);
+        }
       }
 
       /**
@@ -94,11 +103,15 @@ class ProgramMemory{
       matcher = pattern.matcher(instruction);
 
       if (matcher.find()){
-        body = matcher.group(2);
+        body = matcher.group(2).toUpperCase();
         operand = " ";
         isJump = true;
         value = matcher.group(3);
-        return new Instruction(isJump, label, body, operand, value);
+        if(isInstruction(body)){
+          return new Instruction(isJump, label, body, operand, value);
+        }else{
+          throw new AssertionError("Invalid Instruction: " + instruction);
+        }
       }
 
       /**
@@ -110,68 +123,18 @@ class ProgramMemory{
       matcher = pattern.matcher(instruction);
 
       if (matcher.find()){
-        body = matcher.group(0);
+        body = matcher.group(0).toUpperCase();
         operand = " ";
         isJump = true;
         value = "-1";
-        return new Instruction(isJump, label, body, operand, value);
+        if(isInstruction(body)){
+          return new Instruction(isJump, label, body, operand, value);
+        }else{
+          return null;
+        }
       }
 
-      return null;
-
-      /*String[] parsedComment = instruction.split("");
-      if(parsedComment[0].equals("#")){
-        return null;
-      }
-
-      String[] parsedInstr = instruction.split("\\:");
-
-      int index = 0;
-
-      if (parsedInstr.length == 2){ // Posee una etiqueta.
-        label = parsedInstr[0];
-        index++;
-      }
-
-      if(parsedInstr[0].equals("HALT")){
-        return new Instruction(isJump, label, "HALT", " ", "-1");
-      }
-
-      String[] parsedOperand;
-      if (parsedInstr[index].split(" ").length == 2){
-        parsedOperand = parsedInstr[index].split("\\s+");
-        operand = " ";
-      }else if (parsedInstr[index].split("\\*").length == 2){
-        operand = "*";
-        parsedOperand = parsedInstr[index].split("\\*");
-      }else if (parsedInstr[index].split("\\=").length == 2){
-        operand = "=";
-        parsedOperand = parsedInstr[index].split("\\=");
-      }else{
-        throw new AssertionError("No symbol or space between instruction and operand");
-      }
-
-      if (isInstruction(parsedOperand[0])){
-        body = parsedOperand[0];
-        System.out.println(parsedOperand[0]);
-      }else{
-        throw new AssertionError("No instruction");
-      }
-
-
-      if (body.equals("JZERO") || body.equals("JUMP") || body.equals("JGTZ")){
-                isJump = true;
-      }
-
-
-      if (parsedOperand[1] != null){ // Hay operando
-          System.out.println(parsedOperand[1]);
-          String[] value = parsedOperand[1].split("\\#"); // Removes possible comments
-          System.out.println(value[0]);
-          return new Instruction(isJump, label, body, operand, value[0]);
-      }else{
-        throw new AssertionError("No operand");
-      }*/
+      throw new AssertionError("Invalid Instruction: " + instruction);
 
     }
 
@@ -242,6 +205,12 @@ class ProgramMemory{
         }
     }
 
+    /**
+     * Returns the instruction located in the position of the instrPointer.
+     * @param  instrPointer  index of the position in the array from where
+     *                       we want to retrieve the instruction.
+     * @return               the instruction.
+     */
     public Instruction getInstruction(int instrPointer){
       return prMemory.get(instrPointer);
     }
@@ -249,13 +218,13 @@ class ProgramMemory{
     /**
     *   It returns an instruction accesing to it by its index
     *   in the ArrayList.
-    *   @param label   integer that represents the index of the
-    *                  instruction in the ArrayList.
-    *   @return        String that contains the instrucion with
-    *                  that specific label.
+    *   @param position  integer that represents the index of the
+    *                    instruction in the ArrayList.
+    *   @return          String that contains the instrucion with
+    *                    that specific label.
     */
-    public Instruction readInstruction(int label){
-        return prMemory.get(label);
+    public Instruction readInstruction(int position){
+        return prMemory.get(position);
     }
 
     public String toString(){
@@ -266,7 +235,10 @@ class ProgramMemory{
       return str;
     }
 
-
+    /**
+     * Getter of the program memory's size.
+     * @return  the size of the array that contains the program instructions.
+     */
     public int getSize(){
       return prMemory.size();
     }
