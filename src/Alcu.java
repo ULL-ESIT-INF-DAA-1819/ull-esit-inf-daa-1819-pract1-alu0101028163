@@ -14,6 +14,7 @@ public class Alcu{
     private int         debugMode;
     private ArrayList<Integer> inputTapeContent;
     private ArrayList<Integer> outputTapeContent;
+    private Integer     executedIntructions;
 
     /**
      * Constructor of the Arithmetic Logic and Control Unit.
@@ -38,6 +39,7 @@ public class Alcu{
         instrPointer = 0;
         inputTapeContent = readingHead.readFullTape(inputTape);
         outputTapeContent = new ArrayList<Integer>();
+        executedIntructions = 0;
     }
 
     /**
@@ -371,6 +373,7 @@ public class Alcu{
           }
           instrPointer = -1;
          }
+          executedIntructions++;
       }
       if(debugMode == 1)
       machineTrace();
@@ -454,6 +457,7 @@ public class Alcu{
       else
       System.out.println("FINAL RESULT: \n");
 
+      System.out.println("EXECUTED INSTRUCTIONS : " + executedIntructions);
       System.out.print("INPUT TAPE ");
       System.out.println(inputTapeContent);
 
