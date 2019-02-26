@@ -72,8 +72,13 @@ class ProgramMemory{
         label = matcher.group(1);
         label = label.substring(0, label.length() - 1);
         body = matcher.group(2).toUpperCase();
-        operand = matcher.group(3);
-        value = matcher.group(4);
+        // if (body.equals("HALT")){
+        //   operand = " ";
+        //   value = "-1";
+        // }else{
+          operand = matcher.group(3);
+          value = matcher.group(4);
+      //  }
         return new Instruction(isJump, label, body, operand, value);
       }
 
@@ -125,7 +130,6 @@ class ProgramMemory{
       if (matcher.find()){
         body = matcher.group(0).toUpperCase();
         operand = " ";
-        isJump = true;
         value = "-1";
         if(isInstruction(body)){
           return new Instruction(isJump, label, body, operand, value);

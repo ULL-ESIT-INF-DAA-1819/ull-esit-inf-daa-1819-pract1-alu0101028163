@@ -7,3 +7,5 @@ This directory is organised as follows:
       ├── report       # LaTeX template for the report
       ├── slides       # LaTeX Beamer template for the slides
       ├── src          # Source code
+
+Modificación realizada y funciona, su nombre es "log.ram"
