@@ -372,11 +372,13 @@ public class Alcu{
             System.out.println(e);
           }
           instrPointer = -1;
+          executedIntructions--;
          }
           executedIntructions++;
       }
       if(debugMode == 1)
       machineTrace();
+
       stop();
     }
 
