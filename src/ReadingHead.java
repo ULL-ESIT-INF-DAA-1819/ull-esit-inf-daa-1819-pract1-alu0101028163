@@ -71,7 +71,7 @@ class ReadingHead{
         }
 
         public static void main(String args[]) throws Exception{
-            ReadingHead rh = new ReadingHead("inputFile.txt");
+            ReadingHead rh = new ReadingHead("input_tape.in");
             for (int i = 0; i < 10; i++){
                 System.out.println(rh.readSymbol());
             }

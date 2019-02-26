@@ -51,7 +51,7 @@ public class WritingHead{
     }
 
     public static void main(String args[]) throws Exception{
-        WritingHead wh = new WritingHead("outputTape.txt");
+        WritingHead wh = new WritingHead("output_tape.out");
         wh.writeSymbol(new Integer(20));
         wh.closeTape();
     }

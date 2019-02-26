@@ -246,7 +246,8 @@ class ProgramMemory{
     }
 
     public static void main(String args[]) throws Exception{
-        ProgramMemory pm = new ProgramMemory("myProgram.out");
+
+        ProgramMemory pm = new ProgramMemory("ram_program.ram");
         pm.insertLabels();
         System.out.println(pm);
         //Instruction instr = pm.getInstruction(0);
