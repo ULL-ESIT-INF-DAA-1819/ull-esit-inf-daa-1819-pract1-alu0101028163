@@ -134,7 +134,7 @@ class ProgramMemory{
         }
       }
 
-      throw new AssertionError("Invalid Instruction: " + instruction);
+      return null;
 
     }
 
@@ -150,6 +150,7 @@ class ProgramMemory{
       for (int i = 0; i < prMemory.size(); i++){
         if (prMemory.get(i).getLabel() != null){
           Pair<Integer,String> pair = new Pair<Integer,String>(new Integer(i), prMemory.get(i).getLabel());
+          //System.out.println("INSTRUCTION NUMBER: " + i + " LABEL : " + prMemory.get(i).getLabel());
           myLabels.add(pair);
         }
       }
@@ -158,6 +159,7 @@ class ProgramMemory{
         if (prMemory.get(i).isJumpInstruction()){
           for (int j = 0; j < myLabels.size(); j++){
             if (prMemory.get(i).getValue().equals(myLabels.get(j).getValue())){
+                //System.out.println(prMemory.get(i).getValue() + " EQUALS " + myLabels.get(j).getValue() );
                 prMemory.get(i).setValue(Integer.toString(myLabels.get(j).getKey()));
             }
           }

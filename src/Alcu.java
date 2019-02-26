@@ -432,12 +432,15 @@ public class Alcu{
     * Prints the content of the input and output tapes,
     * the program and data memory and current instruction being
     * executed.
-    * @throws Exception 
+    * @throws Exception
     */
    public void machineTrace() throws Exception{
       System.out.println("-------------------------");
       System.out.println(programMemory);
       System.out.println(dataMemory);
+
+      if(instrPointer != -1 && instrPointer != programMemory.getSize())
+      System.out.println("CURRENT INSTRUCTION: " + programMemory.getInstruction(instrPointer));
 
       System.out.print("INPUT TAPE [ ");
       File tape = new File(inputTape);

@@ -46,6 +46,7 @@ public class WritingHead{
     * @throws  IOException  If an I/O error occurs
     */
     public void closeTape() throws Exception{
+        writer.flush();
         writer.close();
     }
 
