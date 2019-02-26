@@ -12,6 +12,8 @@ public class Alcu{
     private WritingHead writingHead;
     private int         instrPointer;
     private int         debugMode;
+    private ArrayList<Integer> inputTapeContent;
+    private ArrayList<Integer> outputTapeContent;
 
     /**
      * Constructor of the Arithmetic Logic and Control Unit.
@@ -34,6 +36,8 @@ public class Alcu{
         readingHead = new ReadingHead(inputTape);
         writingHead = new WritingHead(outputTape);
         instrPointer = 0;
+        inputTapeContent = readingHead.readFullTape(inputTape);
+        outputTapeContent = new ArrayList<Integer>();
     }
 
     /**
@@ -226,7 +230,7 @@ public class Alcu{
      *                                  argument or the accumulator.
      */
     public void read(String operand, Integer direction) throws Exception{
-
+      inputTapeContent.remove(0);
        if (operand.equals(" ")){
          if(direction != 0){
            dataMemory.setData(direction, readHead());
@@ -256,15 +260,18 @@ public class Alcu{
     public void write(String operand, Integer value) throws Exception{
       if (operand.equals("=")){
         writeHead(value);
+        outputTapeContent.add(value);
       }else if (operand.equals(" ")){
         if(value != 0){
          writeHead(dataMemory.getData(value));
+         outputTapeContent.add(dataMemory.getData(value));
        }else{
          throw new IllegalArgumentException("Accumulator can't write into output tape by write instruction");
        }
       }else if (operand.equals("*")){
         Integer newDirection = dataMemory.getData(value);
         writeHead(dataMemory.getData(newDirection));
+        outputTapeContent.add(dataMemory.getData(newDirection));
       }else{
         throw new IllegalArgumentException("No valid operand");
       }
@@ -435,30 +442,33 @@ public class Alcu{
     * @throws Exception
     */
    public void machineTrace() throws Exception{
-      System.out.println("-------------------------");
+      System.out.println(".-----------------------------------------------------.");
+      System.out.println("|------------------ NEXT ITERATION -------------------|");
+      System.out.println(".-----------------------------------------------------.");
+
       System.out.println(programMemory);
       System.out.println(dataMemory);
 
       if(instrPointer != -1 && instrPointer != programMemory.getSize())
-      System.out.println("CURRENT INSTRUCTION: " + programMemory.getInstruction(instrPointer));
+      System.out.println("CURRENT INSTRUCTION: " + programMemory.getInstruction(instrPointer) + "\n");
+      else
+      System.out.println("FINAL RESULT: \n");
 
-      System.out.print("INPUT TAPE [ ");
-      File tape = new File(inputTape);
-      BufferedReader reader = new BufferedReader(new FileReader(tape));
-      String str = " ";
-      while ((str = reader.readLine()) != null){
-        System.out.print(str + " ");
-      }
-      System.out.print("]\n");
-      reader.close();
-      System.out.print("OUTPUT TAPE [ ");
-      tape = new File(outputTape);
-      reader = new BufferedReader(new FileReader(tape));
-      str = " ";
-      while ((str = reader.readLine()) != null){
-        System.out.print(str + " ");
-      }
-      System.out.print("]\n");
+      System.out.print("INPUT TAPE ");
+      System.out.println(inputTapeContent);
+
+      System.out.print("OUTPUT TAPE ");
+      System.out.println(outputTapeContent);
+      System.out.println(" ");
+
+      // System.out.print("OUTPUT TAPE [ ");
+      // tape = new File(outputTape);
+      // reader = new BufferedReader(new FileReader(tape));
+      // str = " ";
+      // while ((str = reader.readLine()) != null){
+      //   System.out.print(str + " ");
+      // }
+      // System.out.print("]\n");
    }
 
 

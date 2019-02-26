@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.*;
+
 
 /***
 *   This class reads the data from the input tape.
@@ -44,6 +46,19 @@ class ReadingHead{
 
         public String readSymbol() throws Exception {
             return reader.readLine();
+        }
+
+
+        public ArrayList<Integer> readFullTape(String inputTape) throws Exception{
+            ArrayList<Integer> inputTapeContent = new ArrayList<Integer>();
+            File tape = new File(inputTape);
+            BufferedReader copyReader = new BufferedReader(new FileReader(tape));
+            String str = "";
+            while ((str = copyReader.readLine()) != null){
+              inputTapeContent.add(Integer.parseInt(str));
+            }
+            copyReader.close();
+            return inputTapeContent;
         }
 
         /**
